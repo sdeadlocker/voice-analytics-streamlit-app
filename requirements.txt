@@ -1,5 +1,12 @@
+numpy==
+librosa==
 openai==0.27.2
-transformers==4.27.3
-whisper==1.1.10
+openpyxl==3.1.2
 pandas==1.5.3
-
+spacy==3.5.1
+streamlit==1.20.0
+textblob==0.17.1
+transformers==4.27.3
+# whisper==1.1.10
+git+https://github.com/openai/whisper.git
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0-py3-none-any.whl
