@@ -1,14 +1,14 @@
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
 numpy==1.23.5
 librosa==0.10.0.post2
 openai==0.27.2
+openai-whisper @ git+https://github.com/openai/whisper.git@b5851c6c40e753606765ac45b85b298e3ae9e00d
 openpyxl==3.1.2
 pandas==1.5.3
+scipy==1.10.1
 spacy==3.5.1
+sounddevice==0.4.6
 streamlit==1.20.0
 textblob==0.17.1
 transformers==4.27.3
-# whisper==1.1.10
-# git+https://github.com/openai/whisper.git
-openai-whisper @ git+https://github.com/openai/whisper.git@b5851c6c40e753606765ac45b85b298e3ae9e00d
-# https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0-py3-none-any.whl
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
+whisper==1.1.10

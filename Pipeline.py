@@ -174,7 +174,7 @@ class Audio_to_text:
         
         # Getting openai response  
         for i in range(length_of_prompt):
-            print(param_list[i])
+            # print(param_list[i])
             custom_df_type_list.append(df_Parameter_list[i])
             prmt_param = self.saved_response + " Provide the score only between " + param_list[i]
         
@@ -213,7 +213,7 @@ class Audio_to_text:
 
         # df = pd.DataFrame((res))
         df1=pd.DataFrame.from_dict(data)
-        print(df1)
+        # print(df1)
         open_Ai_Score=df2.join(df1)
 
     # self.write_df_toexcel(open_Ai_Score, file_name=excel_name, sheet_name=f"{model}-{temperature}" )
