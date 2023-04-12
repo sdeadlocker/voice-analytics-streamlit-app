@@ -5,6 +5,7 @@ openai==0.27.2
 openai-whisper @ git+https://github.com/openai/whisper.git@b5851c6c40e753606765ac45b85b298e3ae9e00d
 openpyxl==3.1.2
 pandas==1.5.3
+pyarrow==11.0.0
 scipy==1.10.1
 spacy==3.5.1
 sounddevice==0.4.6
