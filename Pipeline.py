@@ -1,10 +1,11 @@
 # python -m spacy download en_core_web_sm
 
-import pandas as pd
 import io
 import librosa
 import numpy as np
+import pandas as pd
 import openai
+import os
 import requests
 from time import sleep
 import whisper
@@ -14,10 +15,8 @@ import openpyxl
 from os.path import exists
 from transformers import GPT2Tokenizer
 from openpyxl import load_workbook
-# import seaborn as sns
 import spacy
 from textblob import TextBlob
-# import matplotlib.pyplot as plt
 import re
 
 # set audio path of audio file
@@ -25,10 +24,6 @@ import re
 
 # with open("audio_file.wav", "wb") as f:
 # audio_path = r"audio_file.wav"
-    # audio_path = r"c0fec98f-91de-4349-b21d-25dc05f55eaf_0_r.wav"
-
-# if __name__ == "__main__":
-    # code to be executed if this file is run as the main program
 
 
 class Audio_to_text:
@@ -623,4 +618,17 @@ class VoiceParameterEvaluator:
 # # create an instance of the VoiceParameterEvaluator class and call its assign_score method
 # score_obj = VoiceParameterEvaluator()
 # score_obj.assign_score(df, Path(audio_path).stem+ '.xlsx')        
-        
+
+
+def rename_file(current_file_path, new_file_name):
+    # Get the directory path and file extension
+    directory_path = os.path.dirname(current_file_path)
+    file_extension = os.path.splitext(current_file_path)[1]
+    
+    # Create the new file path
+    new_file_path = os.path.join(directory_path, new_file_name + file_extension)
+    
+    # Rename the file
+    os.rename(current_file_path, new_file_path)
+    return new_file_path
+      
