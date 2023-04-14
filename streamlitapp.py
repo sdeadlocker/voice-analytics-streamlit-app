@@ -11,10 +11,18 @@ from scipy.io.wavfile import write
 from datetime import datetime
 import pyaudio
 import wave
+import glob
+import os.path
+import time
+import functools
+import operator
 
-file=datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+
+# to generates current date and time string for output file naming
+Time_stamp=datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
 
 disabled_val = True
+# Sets configuration options for a Streamlit app page
 st.set_page_config(page_title="Voice Analytics App", initial_sidebar_state="collapsed", layout="wide")
 
 # Define custom CSS to position the header and adjust margins
@@ -48,17 +56,17 @@ header_html = """
 </header>
 """
 st.write(header_html, unsafe_allow_html=True)
-# Add an image
 
+# Add an image
 st.image("https://www.cleartouch.in/wp-content/uploads/2022/03/BlogImage-Everything-you-wanted-to-know-about-voice-analytics.png", 
          use_column_width=True, caption="Automating sales call auditing")
 
 # Add the heading content
 st.markdown("### This app allows users to input sales call data via three options(Audio File/Microphone/Plain Text)")
-
 st.markdown('**Please select an input source:**')
 st.write('Upload a audio/Record a audio/Write text to get started')
 
+# Input selection widget
 input_type = st.selectbox('Select input type', ['Audio file', 'Microphone', 'Plain text'])
 st.markdown("""
 <style>
@@ -73,47 +81,61 @@ def disable():
     
 # Define a function to record audio 
 def record_audio():
-    freq  = 48000  # Sample rate
-    seconds = 300 # Duration of recording
-        # Record audio
-    recording = sd.rec(int(seconds * freq), samplerate=freq, channels=1,blocking=True)
-    sd.wait()
-    audio_path = os.path.join(os.getcwd(), "Stored Data", (file)+".wav")
+    """
+    Records audio for a specified duration and saves it as a WAV file in the 'Stored Data' directory of the current working directory.
+    
+    Returns:
+        str: The path to the saved audio file.
+    """
+    freq  = 44100  # Sample rate
+    seconds = 1000# Duration of recording
+    print("-----Recording started...")
+     # Record audio
+    recording = sd.rec(int(seconds * freq), samplerate=freq, channels=1)
+    time.sleep(10)
+    audio_path = os.path.join(os.getcwd(), "Stored Data", "Recording-"+(Time_stamp)+".wav")
     write(audio_path, freq, recording)
     print("Audio saved at",audio_path)
     return audio_path
-
+     
 customized_button = st.markdown(""" <style >
         .strecord_button, div.stButton {text-align:center}
         </style>""", unsafe_allow_html=True)
  
+# saving output excel and displaying results 
 def output_dataframe(path):
-    # Get the file path of the recorded audio
-    #  print('audio path:', path)
+     """
+    Generates an Excel file with voice analysis scores and reasons from an audio file at the specified path.
+    Displays the resulting pandas DataFrame in a Streamlit app.
+    
+    Args:
+        path (str): The path to the audio file to analyze.
+    
+    Returns:
+        None
+    """
      obj = Audio_to_text(audio_file=open(path, 'rb'))
      df = obj.response_prompt(temperature=0.7, length_of_prompt=15)
      score_obj = VoiceParameterEvaluator()
-     output_file_path = os.path.join(os.getcwd(), 'Stored Data', "Recording-"+(file)+'.xlsx')
+     output_file_path = os.path.join(os.getcwd(), 'Stored Data', "Recording-"+(Time_stamp)+'.xlsx')
      score_obj.assign_score(df, output_file_path)
-
-        # Read the output Excel file into a pandas dataframe
+     # Read the output Excel file into a pandas dataframe
      df_output = pd.read_excel(output_file_path)
 
-         # create new column 'Parameters' with blank values
+      # create new column 'Parameters' with blank values
      df_output.insert(0, 'Parameters', '')
 
-        # set first row of 'Parameters' column to 'Scores and Reason'
+     # set first row of 'Parameters' column to 'Scores and Reason'
      df_output.at[0, 'Parameters'] = 'Scores and Reason'
 
-        # Transpose the DataFrame and reset index to column names
+    # Transpose the DataFrame and reset index to column names
      df_output = df_output.T.reset_index()
 
-        # Set the column names to the first row and drop the old index column
+     # Set the column names to the first row and drop the old index column
      df_output.columns = df_output.iloc[0]
      df_output = df_output.drop(0)
     
     # Display the output dataframe in the Streamlit app
-   
      st.text("Output file generated")
      return st.write(df_output)
 
@@ -122,6 +144,7 @@ def output_dataframe(path):
 if not os.path.exists("Stored Data"):
     os.makedirs("Stored Data")
 
+# If the user selects the Audiofile, save it to disk, then call the Pipeline
 if input_type == 'Audio file':
     audio_file = st.file_uploader("Upload audio file", type=["mp3", "wav"])
 
@@ -200,9 +223,9 @@ if 'input_disabled' in st.session_state:
 # Reset enter_pressed session state variable so user can enter new number of parameters for the next file
     st.session_state.enter_pressed = False
 
-
 # If the user selects the microphone, record audio and save it to disk, then call the Pipeline
 elif input_type == 'Microphone':
+    # print('strting from microphine',saved_audio_path)
     st.write('Click the button below to start recording:')
   
     st.session_state.disabled = False
@@ -212,43 +235,50 @@ elif input_type == 'Microphone':
     #For stopping the recording
     stop= st.empty()
     stop_button = stop.button('Stop Recording',key='stop_button',disabled=st.session_state.disabled) 
-   
+    
     # Use session_state to keep track of whether the user has started recording or not
     if 'recording' not in st.session_state:
         st.session_state.recording = False
         
      # If the user clicks the record button, start recording audio
     if record_button and not st.session_state.recording:
-            st.session_state.recording = True
-            st.session_state.disabled = True
-            record_button = record.button('Recording',disabled=st.session_state.disabled)
-            st.text('Recording started...')
-            st.text('(Please speak into your microphone)')
-            st.text('(Click "Stop Recording" to finish and transcribe)')
-            audio_path = record_audio()
-            print('start record btn clicked',audio_path)
-            # output_dataframe(audio_path)
-            output_dataframe(audio_path)
-
+        st.session_state.recording = True
+        st.session_state.disabled = True
+        record_button = record.button('Recording',disabled=st.session_state.disabled)
+        # record_start()
+        st.text('Recording started...')
+        st.text('(Please speak into your microphone)')
+        st.text('(Click "Stop Recording" to finish and transcribe)')
+        record_audio()
 
     # If the user clicks the stop button, stop recording audio and generate results
     if stop_button and st.session_state.recording:
             st.session_state.recording = False
+            st.session_state.disabled = True
+            stop_button = stop.button('Stop Recording',disabled=st.session_state.disabled)
+            time.sleep(30)
             st.text('Recording stopped!')
             st.markdown("#### Number of parameters we are checking is 26")
-            st.session_state.disabled = True
-            stop_button = stop.button('Recording Stopped',disabled=st.session_state.disabled)
-            audio_path = record_audio()
-            st.text('Generating results...')
-            output_dataframe(audio_path)
-            
-            st.text("Output file generated")
-       
+            def convertTuple(tup):
+                #To convert tuple to string"
+                str = functools.reduce(operator.add, (tup))
+                return str
+
+            current_location=(os.getcwd())
+            folder_name='/Stored Data'
+            file_loaction=current_location+folder_name
+            file_path=convertTuple(file_loaction)
+            file_type=r'/*wav'
+            files=glob.glob(file_path+file_type)
+            max_file=max(files,key=os.path.getctime)
+            output_dataframe(max_file)
+
             customized_button = st.markdown("""
             <style >
             .strecord_button, div.stButton {text-align:center}  }
             </style>""", unsafe_allow_html=True)
 
+# If the user selects the Plain Text, save it to disk, then call the Text_Pipeline
 elif input_type == 'Plain text':
    
     # Use session_state to keep track of whether the user has pressed enter or not
@@ -264,7 +294,6 @@ elif input_type == 'Plain text':
    # Display the number of parameters to check
     st.text("Number of parameters we are checking is 26")
 
- 
     st.session_state.disabled = False
     submit= st.empty()
     submit_btn = submit.button('Submit',disabled=st.session_state.disabled) 
@@ -273,16 +302,14 @@ elif input_type == 'Plain text':
         
         st.session_state.disabled = True
         submit_btn = submit.button('Submiting',disabled=st.session_state.disabled)
-      
-        
+
         # Save the input text to a file
-        file_path = os.path.join("Stored Data", (file)+".txt")
+        file_path = os.path.join("Stored Data", (Time_stamp)+".txt")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(input_text)
             
         # Set the default number of parameters to check to 15
         length_of_prompt = 15
-
 
         # Call the PlainText class from Text_Input.py and pass the file path as an argument
         obj = Plain_text(input_text=input_text)
@@ -290,7 +317,7 @@ elif input_type == 'Plain text':
 
         # create an instance of the PlainTextParameterEvaluator class and call its assign_score method
         score_obj = PlainTextParameterEvaluator()
-        output_file_path = os.path.join("Stored Data", "Text-"+(file)+".xlsx")
+        output_file_path = os.path.join("Stored Data", "Text-"+(Time_stamp)+".xlsx")
         score_obj.assign_score(df, output_file_path)
 
         # Read the output Excel file into a pandas dataframe
@@ -301,8 +328,7 @@ elif input_type == 'Plain text':
 
         except:
             st.warning("Automatic type conversion was unsuccessful. Please check your data types.")
-        
-        
+
          # create new column 'Parameters' with blank values
         df_output.insert(0, 'Parameters', '')
 

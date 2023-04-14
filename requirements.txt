@@ -1,4 +1,5 @@
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
+glob2==0.7
 numpy==1.23.5
 librosa==0.10.0.post2
 openai==0.27.2

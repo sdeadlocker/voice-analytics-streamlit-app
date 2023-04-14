@@ -247,7 +247,9 @@ class VoiceParameterEvaluator:
 
         # return dataframe
         
-        pattern = r'\b(very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
+        # pattern = r'\b(very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
+
+        pattern = r'\b(?:very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
 
         # Check if the call starts with a valid greeting
         valid_greeting = dataframe['transcribe'].str.lower().str.contains(pattern, regex=True)

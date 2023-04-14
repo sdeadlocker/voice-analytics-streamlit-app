@@ -128,7 +128,7 @@ class Plain_text:
 
         # df = pd.DataFrame((res))
         df1=pd.DataFrame.from_dict(data)
-        print(df1)
+        # print(df1)
         open_Ai_Score=df2.join(df1)
 
         # self.write_df_toexcel(open_Ai_Score, file_name=excel_name, sheet_name=f"{model}-{temperature}" )
@@ -163,7 +163,9 @@ class PlainTextParameterEvaluator:
         # dataframe['greet_reason'] = dataframe.apply(lambda row: 'Because caller greeted properly' if row['valid_greeting'] else 'Because caller did not greet properly', axis=1)
 
         # return dataframe
-        pattern = r'\b(very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
+        # pattern = r'\b(very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
+
+        pattern = r'\b(?:very good morning|good morning|very good afternoon|good afternoon|very good evening|good evening)\b[\w\W]*'
 
         # Check if the call starts with a valid greeting
         valid_greeting = dataframe['transcribe'].str.lower().str.contains(pattern, regex=True)
