@@ -7,8 +7,7 @@ This is a Streamlit application for automated sales call auditing. It takes an a
 ## Getting Started
 To get started with the application, clone the repository and navigate to the project directory. Install the required dependencies using pip install -r requirements.txt and run the application using streamlit run app.py.
 ### Below is the landing page of our app! 
-<!-- ![Example Image](example.png) -->
-![Example Image](image.png)
+![Example Image](home.png)
 
 ## Usage
 - Upload an audio file, record an audio file, or provide a plain text transcript.
