@@ -1,21 +1,21 @@
-import streamlit as st
-import pandas as pd
-import subprocess
 import os
-os.chdir(os.path.dirname(__file__))
-from pathlib import Path 
-from Pipeline import Audio_to_text, VoiceParameterEvaluator
-from Text_Pipeline import Plain_text, PlainTextParameterEvaluator
-import sounddevice as sd
-from scipy.io.wavfile import write
-from datetime import datetime
-import pyaudio
 import wave
 import glob
-import os.path
 import time
+import pyaudio
+import os.path
 import functools
 import operator
+import subprocess
+import pandas as pd
+import streamlit as st
+from pathlib import Path 
+import sounddevice as sd
+from datetime import datetime
+from scipy.io.wavfile import write
+os.chdir(os.path.dirname(__file__))
+from Pipeline import Audio_to_text, VoiceParameterEvaluator
+from Text_Pipeline import Plain_text, PlainTextParameterEvaluator
 
 
 # to generates current date and time string for output file naming
@@ -82,8 +82,8 @@ def disable():
 # Define a function to record audio 
 def record_audio():
     """
-    Records audio for a specified duration and saves it as a WAV file in the 'Stored Data' directory of the current working directory.
-    
+    Records audio for a specified duration using the sounddevice package, saves it as a WAV file in the 
+    'Stored Data' directory of the current working directory and returns the file path.
     Returns:
         str: The path to the saved audio file.
     """
@@ -112,7 +112,7 @@ def output_dataframe(path):
         path (str): The path to the audio file to analyze.
     
     Returns:
-        None
+        dataframe: Pandas DataFrame with scores and reason
     """
      obj = Audio_to_text(audio_file=open(path, 'rb'))
      df = obj.response_prompt(temperature=0.7, length_of_prompt=15)
@@ -304,7 +304,7 @@ elif input_type == 'Plain text':
         submit_btn = submit.button('Submiting',disabled=st.session_state.disabled)
 
         # Save the input text to a file
-        file_path = os.path.join("Stored Data", (Time_stamp)+".txt")
+        file_path = os.path.join("Stored Data", "Text-"+(Time_stamp)+".txt")
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(input_text)
             

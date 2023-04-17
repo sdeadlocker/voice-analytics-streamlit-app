@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import openai
 import os
+import spacy
+import re
 import requests
 from time import sleep
 import whisper
@@ -13,11 +15,12 @@ import os.path
 from pathlib import Path 
 import openpyxl
 from os.path import exists
+from dotenv import load_dotenv
 from transformers import GPT2Tokenizer
 from openpyxl import load_workbook
-import spacy
+
 from textblob import TextBlob
-import re
+
 
 # set audio path of audio file
 # audio_path = "f7422f49-5b42-48aa-a98c-67f1da3bda21_0_r.wav"
@@ -164,8 +167,18 @@ class Audio_to_text:
 
         print(excel_name)
         
-        with open("Api_key.txt", "r") as f:
-            api_key=f.read()   
+        # with open("Api_key.txt", "r") as f:
+        #     api_key=f.read()
+
+        # Load variables from .env file into environment
+        load_dotenv()
+        api_key = os.environ.get('API_KEY')
+        if api_key is None:
+            print('API key not found in environment variables')
+        # else:
+        #     # Use the API key in your code
+        #     print(f'API key: {api_key}')
+   
         
         # Getting openai response  
         for i in range(length_of_prompt):
@@ -412,7 +425,6 @@ class VoiceParameterEvaluator:
 
         return score, reason
 
-    
     def teach_method(self, row):        
         """
         Calculates the score and reason for a given row based on the keywords found in the 'transcribe' column.

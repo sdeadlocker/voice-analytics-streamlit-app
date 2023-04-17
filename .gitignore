@@ -1,2 +1,7 @@
 venv
 Stored Data
+Audio_Transcription.xlsx
+.ipynb_checkpoints
+.vscode
+__pycache__
+Api_key.txt

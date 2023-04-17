@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import openai
 from openpyxl import load_workbook
@@ -6,6 +7,7 @@ from time import sleep
 from pathlib import Path 
 import openpyxl
 from os.path import exists
+from dotenv import load_dotenv
 from transformers import GPT2Tokenizer
 from openpyxl import load_workbook
 from textblob import TextBlob
@@ -85,8 +87,17 @@ class Plain_text:
         excel_name='text_input.xlsx'
         print(excel_name)
         
-        with open("Api_key.txt", "r") as f:
-            api_key=f.read()   
+        # with open("Api_key.txt", "r") as f:
+        #     api_key=f.read()  
+
+                # Load variables from .env file into environment
+        load_dotenv()
+        api_key = os.environ.get('API_KEY')
+        if api_key is None:
+            print('API key not found in environment variables')
+        # else:
+        #     # Use the API key in your code
+        #     print(f'API key: {api_key}')     
          
         # Getting openai response  
         for i in range(length_of_prompt):
